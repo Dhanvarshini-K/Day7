@@ -112,37 +112,33 @@ const groceryList = [
 {"sku":97,"price":"$90.03","product":"Cookies - Englishbay Chochip","Quantity":25},
 {"sku":98,"price":"$47.59","product":"Tea - Lemon Green Tea","Quantity":5},
 {"sku":99,"price":"$11.63","product":"Hickory Smoke, Liquid","Quantity":10},
-{"sku":100,"price":"$70.68","product":"Tea - Herbal Sweet Dreams","Quantity":1}]
-
-
-function getTotalAmount(groceryList) { 
-    const storeInventory = [
-      {"sku":1,"price":"$94.11","product":"Jam - Apricot","Quantity":2},
-      {"sku":3,"price":"$49.54","product":"Creamers - 10%","Quantity":17},
-    ];
-  
+{"sku":100,"price":"$70.68","product":"Tea - Herbal Sweet Dreams","Quantity":1}]   
    
-    let totalAmount = 0;
+    function getTotalAmount(userSelectedItemList, groceryList) {
+     
+      let totalAmount = 0;
+      const jsonObject = userSelectedItemList.map(JSON.stringify);
+      const uniqueItem = new Set(jsonObject);
+      const uniqueArray = Array.from(uniqueItem).map(JSON.parse);
+ 
+      for (const selectedItem of uniqueArray) {
+          const groceryItem = groceryList.find((item) => item.product === selectedItem.item);
   
-    for (const item of groceryList) {
-      
-      const storeItem = storeInventory.find((inventoryItem) => inventoryItem.product === item.item)
+          if (groceryItem  && typeof selectedItem.quantity === "number" && parseInt(selectedItem.quantity) > 0) {
+              const availableQuantity = Math.min(groceryItem.Quantity, selectedItem.quantity);
+              totalAmount += parseFloat(groceryItem.price.replace('$', '')) * availableQuantity;
+          }
+      }
   
-      if (storeItem) {
-       
-        const availableQuantity = Math.min(storeItem.Quantity, item.quantity);
-        totalAmount += parseFloat(storeItem.price.replace('$', '')) * availableQuantity;
-      }
-      else{
-        return "Invalid product";
-      }
-    }
-
-    return totalAmount.toFixed(2);
+      return totalAmount.toFixed(2);
   }
-  const bill = getTotalAmount([
-   { item: "Jam - Apricot", quantity: 1},
-   { item: 'Creamers - 10%', quantity: 1 }
   
-  ]);
+  const bill = getTotalAmount([
+      { item: 7, quantity: -1 },
+      { item: "Tea - Herbal Sweet Dreams", quantity: 1 },
+      { item: "Goldschalger", quantity: -4.4 },
+      { item: "Jam - Apricot", quantity: "hello" },
+  ], groceryList);
+  
   console.log(`Total Bill: $${bill}`);
+  
